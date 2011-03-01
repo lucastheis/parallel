@@ -5,6 +5,7 @@ Tools for simplified parallel processing.
 __license__ = 'MIT License <http://www.opensource.org/licenses/mit-license.php>'
 __author__ = 'Lucas Theis <lucas@tuebingen.mpg.de>'
 __docformat__ = 'epytext'
+__version__ = '0.0.1'
 
 from multiprocessing import Process, Queue
 from numpy import iterable
@@ -13,9 +14,8 @@ def map(function, arguments):
 	"""
 	Applies a function to a list of arguments in parallel.
 
-	A single thread is created for each argument. If an argument in the list of
-	arguments is iterable, it will be assumed that it is a list of multiple
-	arguments to the function.
+	A single thread is created for each argument. Iterable arguments will be
+	assumed to contain multiple arguments to the function.
 
 	B{Example:}
 
@@ -71,3 +71,43 @@ def map(function, arguments):
 		results[idx] = result
 
 	return results.values()
+
+
+
+def chunkify(lst, num_chunks):
+	"""
+	Splits a list into chunks of equal size (or, if that's not possible, into
+	chunks whose sizes are as equal as possible). The returned elements are in
+	no particular order.
+
+	@type  lst: list
+	@param lst: a list of arbitrary elements
+
+	@type  num_chunks: integer
+	@param num_chunks: number of chunks
+
+	@rtype: list
+	@param: a list of lists (the chunks)
+	"""
+
+	return [lst[i::num_chunks] for i in range(num_chunks)]
+
+
+
+def chunks(num_indices, num_chunks):
+	"""
+	Creates chunks of indices for use with L{map}.
+
+	@type  num_indices: integer
+	@param num_indices: number of indices
+
+	@type  num_chunks: integer
+	@param num_chunks: number of chunks
+
+	@rtype: list
+	@param: a list of lists (the chunks)
+	"""
+
+	indices = range(num_indices)
+
+	return [[chunk] for chunk in chunkify(indices, num_chunks)]
