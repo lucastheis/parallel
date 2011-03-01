@@ -5,9 +5,10 @@ Tools for simplified parallel processing.
 __license__ = 'MIT License <http://www.opensource.org/licenses/mit-license.php>'
 __author__ = 'Lucas Theis <lucas@tuebingen.mpg.de>'
 __docformat__ = 'epytext'
-__version__ = '0.0.1'
+__version__ = '0.0.2b'
 
-from multiprocessing import Process, Queue
+from threading import Thread
+from multiprocessing import Queue
 from numpy import iterable
 
 def map(function, arguments):
@@ -19,7 +20,7 @@ def map(function, arguments):
 
 	B{Example:}
 
-	The first example will create three processes, the second example ten.
+	The first example will create three threads, the second example ten.
 
 		>>> add = lambda x, y: x + y
 		>>> print map(add, [(1, 2), (2, 3), (3, 4)])
@@ -41,7 +42,7 @@ def map(function, arguments):
 
 		queue.put((idx, function(*args)))
 
-	processes = []
+	threads = []
 
 	# queue for storing return values
 	queue = Queue(len(arguments))
@@ -56,21 +57,22 @@ def map(function, arguments):
 			args.extend(elem)
 			args = tuple(args)
 
-		# store and start process
-		processes.append(Process(target=run, args=args))
-		processes[-1].start()
+		# start threads
+		threads.append(Thread(target=run, args=args))
+		threads[-1].start()
 
 	# wait for processes to finish
-	for process in processes:
-		process.join()
+	for thread in threads:
+		thread.join()
 
 	# wrap up results
 	results = {}
+
 	while not queue.empty():
 		idx, result = queue.get()
 		results[idx] = result
 
-	return results.values()
+	return [results[key] for key in sorted(results.keys())]
 
 
 
