@@ -14,7 +14,7 @@ def map(function, arguments):
 	"""
 	Applies a function to a list of arguments in parallel.
 
-	A single thread is created for each argument. Iterable arguments will be
+	A single process is created for each argument. Iterable arguments will be
 	assumed to contain multiple arguments to the function.
 
 	B{Example:}
