@@ -98,6 +98,13 @@ def chunks(num_indices, num_chunks):
 	"""
 	Creates chunks of indices for use with L{map}.
 
+	B{Example:}
+
+		>>> def function(indices):
+		>>>    for i in indices:
+		>>>        do_something(i)
+		>>> map(function, chunks(100, 4))
+
 	@type  num_indices: integer
 	@param num_indices: number of indices
 
