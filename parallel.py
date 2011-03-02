@@ -14,7 +14,7 @@ def map(function, arguments):
 	"""
 	Applies a function to a list of arguments in parallel.
 
-	A single process is created for each argument. Iterable arguments will be
+	A single thread is created for each argument. Iterable arguments will be
 	assumed to contain multiple arguments to the function.
 
 	B{Example:}
@@ -33,6 +33,19 @@ def map(function, arguments):
 	@type  result: list
 	@param result: a list of return values
 	"""
+
+	if not iterable(arguments):
+		raise ValueError("Arguments should be stored in a list.")
+
+	if len(arguments) < 1:
+		raise ValueError("The argument list should not be empty.")
+
+	if len(arguments) == 1:
+		# don't create a process if there is just 1 argument
+		if iterable(arguments[0]):
+			return [function(*arguments[0])]
+		else:
+			return [function(arguments[0])]
 
 	def run(function, queue, idx, *args):
 		"""
