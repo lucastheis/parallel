@@ -5,7 +5,7 @@ Tools for simplified parallel processing.
 __license__ = 'MIT License <http://www.opensource.org/licenses/mit-license.php>'
 __author__ = 'Lucas Theis <lucas@tuebingen.mpg.de>'
 __docformat__ = 'epytext'
-__version__ = '0.0.2'
+__version__ = '0.1.0'
 
 from multiprocessing import Process, Queue
 from numpy import iterable
@@ -14,12 +14,15 @@ def map(function, arguments):
 	"""
 	Applies a function to a list of arguments in parallel.
 
-	A single thread is created for each argument. Iterable arguments will be
-	assumed to contain multiple arguments to the function.
+	A single thread is created for each argument, except if the argument list
+	contains only one element. In this case, no additional process is created.
+
+	Iterable arguments will be assumed to contain multiple arguments to the
+	function.
 
 	B{Example:}
 
-	The first example will create three processes, the second example ten.
+	The first example will fork three processes, the second example ten.
 
 		>>> add = lambda x, y: x + y
 		>>> print map(add, [(1, 2), (2, 3), (3, 4)])
