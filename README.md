@@ -15,7 +15,7 @@ be more efficient. Also, this implementation only utilizes a single machine.
 Getting started
 ---------------
 
-Here\'s a simple first example.
+Here's a simple first example.
 
 	f = lambda x: x * x
 	print map(f, range(10))
@@ -48,7 +48,7 @@ number of processes.
 
 If you want to write into a variable defined outside the function, you have to make sure it is
 stored in *shared memory*. See the Python documentation on the *multiprocessing* module for more information.
-To store a NumPy array in shared memory, you can use David Baddeley\'s *shmarray* implementation.
+To store a NumPy array in shared memory, you can use David Baddeley's *shmarray* implementation.
 
 	from shmarray import zeros
 
