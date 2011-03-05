@@ -90,12 +90,11 @@ def map(function, arguments, max_processes=None):
 
 		queue.put((idx, function(*args)))
 
-	processes = []
-
 	# queue for storing return values
 	queue = Queue(len(arguments))
 
 	# create processes
+	processes = []
 	for idx, elem in enumerate(arguments):
 		# make sure arguments are packed into tuples
 		if not iterable(elem):
@@ -109,15 +108,15 @@ def map(function, arguments, max_processes=None):
 		processes.append(Process(target=run, args=args))
 		processes[-1].start()
 
+	# collect results
+	results = {}
+	for i in range(len(arguments)):
+		idx, result = queue.get()
+		results[idx] = result
+
 	# wait for processes to finish
 	for process in processes:
 		process.join()
-
-	# wrap up results
-	results = {}
-	while not queue.empty():
-		idx, result = queue.get()
-		results[idx] = result
 
 	return [results[key] for key in sorted(results.keys())]
 
