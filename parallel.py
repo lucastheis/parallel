@@ -5,16 +5,16 @@ Tools for simplified parallel processing.
 __license__ = 'MIT License <http://www.opensource.org/licenses/mit-license.php>'
 __author__ = 'Lucas Theis <lucas@tuebingen.mpg.de>'
 __docformat__ = 'epytext'
-__version__ = '0.1.0'
+__version__ = '0.2.0b'
 
 from multiprocessing import Process, Queue
 from numpy import iterable
 
-def map(function, arguments):
+def map(function, arguments, num_processes=None):
 	"""
 	Applies a function to a list of arguments in parallel.
 
-	A single thread is created for each argument, except if the argument list
+	A single process is created for each argument, except if the argument list
 	contains only one element. In this case, no additional process is created.
 
 	Iterable arguments will be assumed to contain multiple arguments to the
@@ -35,6 +35,8 @@ def map(function, arguments):
 
 	@type  result: list
 	@param result: a list of return values
+
+	@type  num_processes
 	"""
 
 	if not iterable(arguments):
@@ -49,6 +51,25 @@ def map(function, arguments):
 			return [function(*arguments[0])]
 		else:
 			return [function(arguments[0])]
+
+	if num_processes is not None:
+		def wrapper(*arguments):
+			"""
+			Processes chunks of arguments.
+			"""
+
+			results = []
+			for args in arguments:
+				if not iterable(args):
+					args = (args,)
+				results.append(function(*args))
+			return results
+
+		# apply wrapper to chunks of arguments
+		results = map(wrapper, chunkify(arguments, num_processes))
+
+		# flatten list of lists
+		return [result for chunk in results for result in chunk]
 
 	def run(function, queue, idx, *args):
 		"""
