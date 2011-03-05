@@ -5,12 +5,12 @@ Tools for simplified parallel processing.
 __license__ = 'MIT License <http://www.opensource.org/licenses/mit-license.php>'
 __author__ = 'Lucas Theis <lucas@tuebingen.mpg.de>'
 __docformat__ = 'epytext'
-__version__ = '0.2.0b'
+__version__ = '0.2.0'
 
-from multiprocessing import Process, Queue
+from multiprocessing import Process, Queue, cpu_count
 from numpy import iterable
 
-def map(function, arguments, num_processes=None):
+def map(function, arguments, max_processes=None):
 	"""
 	Applies a function to a list of arguments in parallel.
 
@@ -30,13 +30,21 @@ def map(function, arguments, num_processes=None):
 		>>> square = lambda x: x * x
 		>>> print map(square, range(10))
 
+	To restrict the number of processes, use the argument C{max_processes} or
+	set C{map.max_processes} to a default value for all calls to L{map}. By
+	default, the maximum number of processes is the number of available CPUs.
+
+	@type  function: callable
+	@param function: the function or object that will be applied to all arguments
+
 	@type  arguments: list
 	@param arguments: a list which contains the arguments
 
-	@type  result: list
-	@param result: a list of return values
+	@type  max_processes: integer
+	@param max_processes: restricts the number of processes
 
-	@type  num_processes
+	@rtype: list
+	@return: an ordered list of return values
 	"""
 
 	if not iterable(arguments):
@@ -52,7 +60,11 @@ def map(function, arguments, num_processes=None):
 		else:
 			return [function(arguments[0])]
 
-	if num_processes is not None:
+	if max_processes is None and map.__dict__.has_key('max_processes'):
+		# set default number of processes
+		max_processes = map.max_processes
+
+	if max_processes is not None and max_processes < len(arguments):
 		def wrapper(*arguments):
 			"""
 			Processes chunks of arguments.
@@ -66,7 +78,7 @@ def map(function, arguments, num_processes=None):
 			return results
 
 		# apply wrapper to chunks of arguments
-		results = map(wrapper, chunkify(arguments, num_processes))
+		results = map(wrapper, chunkify(arguments, max_processes))
 
 		# flatten list of lists
 		return [result for chunk in results for result in chunk]
@@ -108,6 +120,8 @@ def map(function, arguments, num_processes=None):
 		results[idx] = result
 
 	return [results[key] for key in sorted(results.keys())]
+
+map.max_processes = cpu_count()
 
 
 
