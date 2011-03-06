@@ -36,21 +36,19 @@ A for-loop can easily be parallelized using the following pattern.
 		do_something(i)
 	map(parfor, range(num_tasks))
 
-Currently, there is no direct way to limit the number of forked processes.
-`map` will automatically created a single process for each argument. You can
-use `chunks` to nevertheless relatively conveniently be able to control the
-number of processes.
+The easiest way to limit the number of forked processes is to set the argument
+`max_processes`.
 
-	def parfor(indices):
-		for i in indices:
-			do_something(i)
-	map(parfor, chunks(num_tasks, num_processes))
+	map(function, range(10), max_processes=2)
+
+By default, the maximum number of forked processes is the number of available
+CPUs. You can change this default value by setting `map.max_processes`.
 
 If you want to write to a variable which was defined outside of the function,
 you have to make sure it is stored in *shared memory*. See the Python
 documentation on the *multiprocessing* module for more information.  To store a
-NumPy array in shared memory, you can use David Baddeley's *shmarray*
-implementation.
+NumPy array in shared memory, use the functions from the included *shmarray*
+module.
 
 	from shmarray import zeros
 
