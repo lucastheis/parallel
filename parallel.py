@@ -5,10 +5,14 @@ Tools for simplified parallel processing.
 __license__ = 'MIT License <http://www.opensource.org/licenses/mit-license.php>'
 __author__ = 'Lucas Theis <lucas@tuebingen.mpg.de>'
 __docformat__ = 'epytext'
-__version__ = '0.2.0'
+__version__ = '0.3.0'
 
 from multiprocessing import Process, Queue, cpu_count
 from numpy import iterable
+from numpy.random import rand
+from numpy.random import seed as numpy_seed
+from random import seed as py_seed
+from time import time
 
 def map(function, arguments, max_processes=None):
 	"""
@@ -67,7 +71,7 @@ def map(function, arguments, max_processes=None):
 	if max_processes is not None and max_processes < len(arguments):
 		def wrapper(*arguments):
 			"""
-			Processes chunks of arguments.
+			Helper function which processes chunks of arguments at once.
 			"""
 
 			results = []
@@ -83,24 +87,48 @@ def map(function, arguments, max_processes=None):
 		# flatten list of lists
 		return [result for chunk in results for result in chunk]
 
-	def run(function, queue, idx, *args):
+	def run(function, queue, idx, rnd, *args):
 		"""
-		A helper function for handling return values.
+		A helper function for handling return values. Takes a function and its
+		arguments and stores its result in a queue.
+
+		@type  function: function
+		@param function: handle to function that will be called
+
+		@type  queue: Queue
+		@param queue: stores returned function values
+
+		@type  idx: integer
+		@param idx: index used to identify return values
+
+		@type  rnd: float
+		@param rnd: a random number to seed random number generator
 		"""
 
+		# compute random seed
+		rnd_seed = int(1e6 * rnd + 1e6 * time())
+
+		# without it, different processes are likely to use the same seed
+		numpy_seed(rnd_seed)
+		py_seed(rnd_seed)
+
+		# evaluate function
 		queue.put((idx, function(*args)))
 
 	# queue for storing return values
 	queue = Queue(len(arguments))
+
+	# generate random numbers to randomize processes
+	random_numbers = rand(len(arguments))
 
 	# create processes
 	processes = []
 	for idx, elem in enumerate(arguments):
 		# make sure arguments are packed into tuples
 		if not iterable(elem):
-			args = (function, queue, idx, elem)
+			args = (function, queue, idx, random_numbers[idx], elem)
 		else:
-			args = [function, queue, idx]
+			args = [function, queue, idx, random_numbers[idx]]
 			args.extend(elem)
 			args = tuple(args)
 
