@@ -5,10 +5,10 @@ Tools for simplified parallel processing.
 __license__ = 'MIT License <http://www.opensource.org/licenses/mit-license.php>'
 __author__ = 'Lucas Theis <lucas@tuebingen.mpg.de>'
 __docformat__ = 'epytext'
-__version__ = '0.3.0'
+__version__ = '0.3.1'
 
 from multiprocessing import Process, Queue, cpu_count
-from numpy import iterable
+from numpy import iterable, ceil
 from numpy.random import rand
 from numpy.random import seed as numpy_seed
 from random import seed as py_seed
@@ -155,8 +155,8 @@ map.max_processes = cpu_count()
 def chunkify(lst, num_chunks):
 	"""
 	Splits a list into chunks of equal size (or, if that's not possible, into
-	chunks whose sizes are as equal as possible). The returned elements are in
-	no particular order.
+	chunks whose sizes are as equal as possible). The order of the elements is
+	maintained.
 
 	@type  lst: list
 	@param lst: a list of arbitrary elements
@@ -168,7 +168,18 @@ def chunkify(lst, num_chunks):
 	@param: a list of lists (the chunks)
 	"""
 
-	return [lst[i::num_chunks] for i in range(num_chunks)]
+	chunks = []
+
+	N = 0
+
+	for m in range(num_chunks):
+		n =  int(ceil(float(len(lst) - m) / num_chunks))
+		chunks.append(lst[N:N + n])
+		N = N + n
+
+	return chunks
+
+	#return [lst[i::num_chunks] for i in range(num_chunks)]
 
 
 
