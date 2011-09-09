@@ -3,7 +3,7 @@ A minimal example which demonstrates how parallel computations can be done
 within classes and with shared NumPy arrays.
 """
 
-from parallel import map
+from parallel import mapp
 from shmarray import zeros
 
 class Foo:
@@ -15,9 +15,9 @@ class Foo:
 			self.values[i] = i
 
 	def parallel(self):
-		def function(i):
+		def parfor(i):
 			self.values[i] = i
-		map(function, range(self.values.size))
+		mapp(parfor, range(self.values.size))
 
 if __name__ == '__main__':
 	foo = Foo()
