@@ -16,6 +16,24 @@ except ImportError:
 	np_seed = lambda rseed: None
 
 def mapp(function, *args):
+	"""
+	A parallel implementation of map. An example:
+
+		>>> mapp(lambda x, y: x + y, range(10), range(10))
+
+	@type  function: function
+	@param function: the function that will be applied to the given arguments
+
+	@rtype: list
+	@return: an ordered list of the function's return values
+	"""
+
+	if mapp.max_processes < 2:
+		return map(function, *args)
+
+	if len(args) < 1:
+		raise TypeError('mapp() takes at least 2 arguments')
+
 	def run(function, queue, indices, rseed, *args):
 		# randomize
 		np_seed(rseed)

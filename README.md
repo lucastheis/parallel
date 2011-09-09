@@ -3,7 +3,6 @@ Parallel Map
 
 A parallel implementation of the `map` function.
 
-
 Getting started
 ---------------
 
