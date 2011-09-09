@@ -63,14 +63,14 @@ def mapp(function, *args):
 		processes.append(Process(target=run, args=job_args))
 		processes[-1].start()
 
-	# wait for processes to finish
-	for process in processes:
-		process.join()
-
 	# collect and store results
 	results = {}
 	for _ in range(num_jobs):
 		results.update(queue.get())
+
+	# wait for processes to finish
+	for process in processes:
+		process.join()
 
 	# return sorted results
 	return [results[idx] for idx in range(num_args)]
