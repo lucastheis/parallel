@@ -56,7 +56,7 @@ def mapp(function, *args):
 	processes = []
 	for j in range(num_jobs):
 		# prepare job
-		job_args = [function, queue, indices[j::num_jobs], randint(0, 1E10)] + \
+		job_args = [function, queue, indices[j::num_jobs], randint(0, 1E7)] + \
 			[arg[j::num_jobs] for arg in args]
 
 		# start process
