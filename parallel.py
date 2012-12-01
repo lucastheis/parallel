@@ -15,7 +15,7 @@ def mapp(function, *args):
 	"""
 	A parallel implementation of map. Example:
 
-		>>> mapp(lambda x, y: x + y, range(10))
+		>>> mapp(lambda x, y: x + y, range(10), range(10))
 
 	@type  function: function
 	@param function: the function that will be applied to the given arguments

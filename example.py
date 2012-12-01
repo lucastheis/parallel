@@ -23,8 +23,4 @@ if __name__ == '__main__':
 	foo = Foo()
 	foo.parallel()
 
-	def f():
-		print 'x'
-	mapp(f, range(10))
-
 	print foo.values
